@@ -4,23 +4,38 @@ public class ex2 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Введите первое число (a): ");
+        System.out.println("Введите 3 числа");
+        System.out.println("Ввод: ");
         int a = scanner.nextInt();
-        System.out.print("Введите второе число (b): ");
+        System.out.println("Ввод: ");
         int b = scanner.nextInt();
-        System.out.print("Введите третье число (c): ");
+        System.out.println("Ввод: ");
         int c = scanner.nextInt();
 
         boolean bool = false;
 
         if (a % 5 == 0) {
-            System.out.print("a=" + a + " ");
+            System.out.print("a=" + a);
             bool = true;
         }
+        if (b%5==0)
+        {
+            System.out.print(",");
+        }
+
+        System.out.print(" ");
+
         if (b % 5 == 0) {
             System.out.print("b=" + b + " ");
             bool = true;
         }
+        if (c%5==0)
+        {
+            System.out.print(",");
+        }
+
+        System.out.print("");
+
         if (c % 5 == 0) {
             System.out.print("c=" + c + " ");
             bool = true;
