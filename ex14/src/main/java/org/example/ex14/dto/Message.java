@@ -1,29 +1,39 @@
 package org.example.ex14.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDateTime;
 @Entity
 public class Message {
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private int id;
     private String title;
     private String text;
     private LocalDateTime time;
+    @ManyToOne
+    @JsonIgnore
+    private Person person;
 
-    public Message() {}
+    public Message() {
+    }
 
-    public Message(int id, String title, String text, LocalDateTime time) {
-        this.id = id;
+    public Message(String title, String text, LocalDateTime time, Person person) {
         this.title = title;
         this.text = text;
+        this.person = person;
         this.time = time;
     }
 
-    // Геттеры и сеттеры
+
+    public Message(String title, String text) {
+        this.title = title;
+        this.text = text;
+    }
+
     public int getId() {
         return id;
     }
@@ -55,4 +65,13 @@ public class Message {
     public void setTime(LocalDateTime time) {
         this.time = time;
     }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
 }

@@ -1,38 +1,45 @@
 package org.example.ex14.dto;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Person {
     @Id
-    @GeneratedValue
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String firstname;
     private String surname;
     private String lastname;
     private LocalDate birthday;
 
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages = new ArrayList<>();
+
+
+
     public Person() {
     }
 
-    public Person(String firstname, String surname, String lastname, LocalDate birthday) {
+    public Person(String firstname, String surname, String lastname, LocalDate birthday, List<Message> messages) {
         this.firstname = firstname;
         this.surname = surname;
         this.lastname = lastname;
         this.birthday = birthday;
+        this.messages = messages;
     }
 
-    public Person(int id, String firstname, String surname, String lastname, LocalDate birthday) {
+    public Person(int id, String firstname, String surname, String lastname, LocalDate birthday, List<Message> messages) {
         this.id = id;
         this.firstname = firstname;
         this.surname = surname;
         this.lastname = lastname;
         this.birthday = birthday;
+        this.messages = messages;
     }
 
     public int getId() {
@@ -74,4 +81,19 @@ public class Person {
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void addMessage(Message message) {
+        messages.add(message);
+        message.setPerson(this);
+    }
+
+    public void removeMessage(Message message) {
+        messages.remove(message);
+        message.setPerson(null);
+    }
+
 }
