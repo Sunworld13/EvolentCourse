@@ -1,75 +1,42 @@
 package org.example.ex14.controller;
 
 import org.example.ex14.dto.Message;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.example.ex14.repository.MessageRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 @RestController
+@RequestMapping("/message")
 public class MessageController {
-    private final List<Message> messages = new ArrayList<>();
-    private final AtomicInteger counter = new AtomicInteger(1);
+    private final MessageRepository repository;
 
-    public MessageController() {
-        // Инициализация тестовыми данными
-        messages.add(new Message(counter.getAndIncrement(), "Первое сообщение",
-                "Текст первого сообщения", LocalDateTime.now()));
-        messages.add(new Message(counter.getAndIncrement(), "Второе сообщение",
-                "Текст второго сообщения", LocalDateTime.now().minusHours(1)));
+    public MessageController(MessageRepository repository) {
+        this.repository = repository;
     }
 
-    @GetMapping("/message")
-    public ResponseEntity<List<Message>> getAllMessages() {
-        return new ResponseEntity<>(messages, HttpStatus.OK);
+    @GetMapping
+    public Iterable<Message> getAllMessages() {
+        return repository.findAll();
     }
-//    @GetMapping("/message")
-//    public Iterable<Person> getAllMessages() {
-//        return messages;
-//    }
 
-    @GetMapping("/message/{id}")
-    public ResponseEntity<Message> getMessageById(@PathVariable int id) {
-        Message message = findMessageById(id);
-        if (message != null) {
-            return new ResponseEntity<>(message, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/{id}")
+    public Message getMessageById(@PathVariable int id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
     }
-//    @GetMapping("/message/{id}")
-//    public Optional<Message> findMessageById(@PathVariable int id) {
-//        return messages.stream().filter(p -> p.getId() == id).findFirst();
-//    }
 
-
-    @PostMapping("/message")
+    @PostMapping
     public Message addMessage(@RequestBody Message message) {
-        messages.add(message);
-        return message;
+        return repository.save(message);
     }
 
-    @PutMapping("/message/{id}")
-    public ResponseEntity<Message> updateMessage(@PathVariable int id, @RequestBody Message message) {
-        Message existingMessage = findMessageById(id);
-        if (existingMessage != null) {
-            messages.set(messages.indexOf(existingMessage),message);
-            return new ResponseEntity<>(message, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(addMessage(message), HttpStatus.CREATED);
-        }
+    @PutMapping("/{id}")
+    public Message updateMessage(@PathVariable int id, @RequestBody Message updatedMessage) {
+        updatedMessage.setId(id); // Устанавливаем тот же ID
+        return repository.save(updatedMessage);
     }
 
-    @DeleteMapping("/message/{id}")
+    @DeleteMapping("/{id}")
     public void deleteMessage(@PathVariable int id) {
-        messages.removeIf(p->p.getId()==id);
-    }
-
-    private Message findMessageById(int id) {
-        return messages.stream().filter(m -> m.getId() == id).findFirst().orElse(null);
+        repository.deleteById(id);
     }
 }

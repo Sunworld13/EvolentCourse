@@ -1,14 +1,19 @@
 package org.example.ex14.dto;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
+@Entity
 public class Message {
+    @Id
+    @GeneratedValue
     private int id;
     private String title;
     private String text;
     private LocalDateTime time;
 
-    // Конструкторы
     public Message() {}
 
     public Message(int id, String title, String text, LocalDateTime time) {

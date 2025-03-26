@@ -1,10 +1,10 @@
-package org.example.ex14.dto;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
+package org.example.ex15;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import org.springframework.format.annotation.DateTimeFormat;
+
+
 import java.time.LocalDate;
 
 @Entity
