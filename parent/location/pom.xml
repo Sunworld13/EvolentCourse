@@ -9,10 +9,10 @@
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>location</artifactId>
+    <artifactId>person</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>location</name>
-    <description>location</description>
+    <name>person</name>
+    <description>person</description>
     <url/>
     <licenses>
         <license/>
@@ -56,8 +56,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
 
     <build>
         <plugins>

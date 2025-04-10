@@ -1,4 +1,4 @@
-package com.example.weather.model;
+package com.example.person.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class WeatherData {
+public class Weather {
     @Id
     private String coordinates; // format "lat,lon"
 
