@@ -1,18 +1,17 @@
 package com.example.location.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 @Entity
 @Data
 public class Location {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
-
-    private String person;
-
-    private String city;
-    private Double latitude;
     private Double longitude;
+    private Double latitude;
+    private String name;
 }

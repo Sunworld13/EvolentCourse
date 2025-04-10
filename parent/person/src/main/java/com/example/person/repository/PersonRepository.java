@@ -1,9 +1,13 @@
 package com.example.person.repository;
 
 import com.example.person.model.Person;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface PersonRepository extends CrudRepository<Person, Integer> {
+import java.util.Optional;
+
+public interface PersonRepository extends JpaRepository<Person, Long> {
+    // Поиск по точному совпадению имени
+    Optional<Person> findByFirstname(String firstname);
+
+    boolean existsByFirstname(String firstname);
 }

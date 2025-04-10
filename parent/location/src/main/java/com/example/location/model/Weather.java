@@ -1,18 +1,19 @@
 package com.example.location.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class Weather {
-    @Id
-    private String coordinates; // format "lat,lon"
-
-    private String conditions;
-    private Double temperature;
-    private LocalDateTime lastUpdated;
+    private double temp;
+    private double feels_like;
+    private double temp_min;
+    private double temp_max;
+    private int pressure;
+    private int humidity;
+    private int sea_level;
+    private int grnd_level;
 }
