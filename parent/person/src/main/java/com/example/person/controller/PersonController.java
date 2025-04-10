@@ -67,8 +67,7 @@ public class PersonController {
     public ResponseEntity<?> getPersonWeather(@RequestParam Long id) {
         return repository.findById(id)
                 .map(person -> {
-                    // Здесь должна быть интеграция с LocationService
-                    // Временная заглушка
+                    
                     return ResponseEntity.ok("Weather data for " + person.getLocation());
                 })
                 .orElse(ResponseEntity.notFound().build());
