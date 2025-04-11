@@ -1,12 +1,10 @@
 package com.example.person.controller;
 
 import com.example.person.model.Person;
-import com.example.person.model.Weather;
 import com.example.person.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -15,64 +13,63 @@ import java.util.List;
 public class PersonController {
 
     private final PersonRepository repository;
-    private final RestTemplate restTemplate;
 
     @Autowired
-    public PersonController(PersonRepository repository, RestTemplate restTemplate) {
+    public PersonController(PersonRepository repository) {
         this.repository = repository;
-        this.restTemplate = restTemplate;
     }
 
     @GetMapping
-    public List<Person> getAllPersons() {
-        return repository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getPersons(@RequestParam(required = false) String name) {
+        if (name != null) {
+            return repository.findByFirstname(name)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        }
+        return ResponseEntity.ok(repository.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
-        Person saved = repository.save(person);
-        return ResponseEntity.status(201).body(saved);
+    public ResponseEntity<Person> addPerson(@RequestBody Person person) {
+        if (person.getId() != null && repository.existsById(person.getId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(repository.save(person));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     public ResponseEntity<Person> updatePerson(
-            @PathVariable Long id,
-            @RequestBody Person personDetails) {
+            @RequestParam Long id,
+            @RequestBody Person updatedPerson) {
         return repository.findById(id)
-                .map(person -> {
-                    person.setFirstname(personDetails.getFirstname());
-                    person.setSurname(personDetails.getSurname());
-                    person.setLastname(personDetails.getLastname());
-                    person.setBirthday(personDetails.getBirthday());
-                    person.setLocation(personDetails.getLocation());
-                    return ResponseEntity.ok(repository.save(person));
+                .map(existing -> {
+                    existing.setFirstname(updatedPerson.getFirstname());
+                    existing.setSurname(updatedPerson.getSurname());
+                    existing.setLastname(updatedPerson.getLastname());
+                    existing.setBirthday(updatedPerson.getBirthday());
+                    existing.setLocation(updatedPerson.getLocation());
+                    return ResponseEntity.ok(repository.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+    @DeleteMapping
+    public ResponseEntity<Void> deletePerson(@RequestParam Long id) {
         return repository.findById(id)
                 .map(person -> {
                     repository.delete(person);
-                    return ResponseEntity.noContent().<Void>build();
+                    return ResponseEntity.ok().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{id}/weather")
-    public ResponseEntity<Weather> getWeatherForPerson(@PathVariable Long id) {
+    @GetMapping("/weather")
+    public ResponseEntity<?> getPersonWeather(@RequestParam Long id) {
         return repository.findById(id)
                 .map(person -> {
-                    String url = "http://location-service/location/weather?name=" + person.getLocation();
-                    return ResponseEntity.ok(restTemplate.getForObject(url, Weather.class));
+                    // Здесь должна быть интеграция с LocationService
+                    // Временная заглушка
+                    return ResponseEntity.ok("Weather data for " + person.getLocation());
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
