@@ -1,76 +1,51 @@
 package com.example.person.controller;
 
 import com.example.person.model.Person;
+import com.example.person.model.Weather;
 import com.example.person.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/person")
 public class PersonController {
 
-    private final PersonRepository repository;
-
     @Autowired
-    public PersonController(PersonRepository repository) {
-        this.repository = repository;
+    private PersonRepository repository;
+    @Autowired
+    private RestTemplate restTemplate;
+    private final String url = "http://location-service/weather?location=";
+
+    @GetMapping("{id}/weather")
+    public ResponseEntity<Weather> getWeather(@PathVariable Long id) {
+        if (repository.existsById(id)) {
+            String location = repository.findById(id).get().getLocation();
+            Weather weather = restTemplate.getForObject(url + location, Weather.class);
+            return new ResponseEntity(weather, HttpStatus.OK);
+        }
+        return new ResponseEntity(null, HttpStatus.NOT_FOUND);
     }
 
     @GetMapping
-    public ResponseEntity<?> getPersons(@RequestParam(required = false) String name) {
-        if (name != null) {
-            return repository.findByFirstname(name)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        }
-        return ResponseEntity.ok(repository.findAll());
+    public Iterable<Person> findAll() {
+        return repository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Person> findById(Long id) {
+        return repository.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Person> addPerson(@RequestBody Person person) {
-        if (person.getId() != null && repository.existsById(person.getId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(repository.save(person));
-    }
-
-    @PutMapping
-    public ResponseEntity<Person> updatePerson(
-            @RequestParam Long id,
-            @RequestBody Person updatedPerson) {
-        return repository.findById(id)
-                .map(existing -> {
-                    existing.setFirstname(updatedPerson.getFirstname());
-                    existing.setSurname(updatedPerson.getSurname());
-                    existing.setLastname(updatedPerson.getLastname());
-                    existing.setBirthday(updatedPerson.getBirthday());
-                    existing.setLocation(updatedPerson.getLocation());
-                    return ResponseEntity.ok(repository.save(existing));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> deletePerson(@RequestParam Long id) {
-        return repository.findById(id)
-                .map(person -> {
-                    repository.delete(person);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/weather")
-    public ResponseEntity<?> getPersonWeather(@RequestParam Long id) {
-        return repository.findById(id)
-                .map(person -> {
-                    // Здесь должна быть интеграция с LocationService
-                    // Временная заглушка
-                    return ResponseEntity.ok("Weather data for " + person.getLocation());
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Person> save(@RequestBody Person person) {
+        return repository.findById(person.getId()).isPresent()
+                ? new ResponseEntity(repository.findById(person.getId()), HttpStatus.BAD_REQUEST)
+                : new ResponseEntity(repository.save(person), HttpStatus.CREATED);
     }
 }
